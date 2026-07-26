@@ -1385,10 +1385,88 @@
                 purple: { text: 'text-purple-400', bg: 'bg-purple-950', border: 'border-purple-500/30', hover: 'hover:border-purple-400', tagBg: 'bg-purple-900', tagText: 'text-purple-300', tagBorder: 'border-purple-500/30', gradient: 'linear-gradient(135deg, rgb(49,10,101), rgb(13,18,36), rgb(30,27,75)', badgeBg: 'rgba(168,85,247,0.3)', badgeBorder: '1px solid rgba(192,132,252,0.4)', hoverText: 'color: #c084fc' },
             };
 
+            // ===== FIREBASE REALTIME DATABASE CONFIG =====
+            const FIREBASE_DB_URL = 'https://portfolio-1630f-default-rtdb.firebaseio.com';
+
+            let cachedGames = null;
+            let cachedMemories = null;
+
+            async function fetchFirebaseData(endpoint) {
+                try {
+                    const res = await fetch(`${FIREBASE_DB_URL}/${endpoint}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        return data;
+                    }
+                } catch (e) {
+                    console.warn(`Firebase fetch error for ${endpoint}:`, e);
+                }
+                return null;
+            }
+
+            async function saveFirebaseData(endpoint, data) {
+                try {
+                    await fetch(`${FIREBASE_DB_URL}/${endpoint}.json`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                } catch (e) {
+                    console.error(`Firebase save error for ${endpoint}:`, e);
+                }
+            }
+
             function getGames() {
+                if (cachedGames !== null) return cachedGames;
                 const stored = localStorage.getItem(GAMES_KEY);
                 return stored ? JSON.parse(stored) : DEFAULT_GAMES;
             }
+
+            async function syncGamesFromFirebase() {
+                const remote = await fetchFirebaseData('games');
+                if (remote && Array.isArray(remote)) {
+                    cachedGames = remote;
+                    localStorage.setItem(GAMES_KEY, JSON.stringify(remote));
+                    renderGames();
+                } else if (!localStorage.getItem(GAMES_KEY)) {
+                    saveFirebaseData('games', DEFAULT_GAMES);
+                }
+            }
+
+            async function setGames(gamesList) {
+                cachedGames = gamesList;
+                localStorage.setItem(GAMES_KEY, JSON.stringify(gamesList));
+                await saveFirebaseData('games', gamesList);
+                renderGames();
+            }
+
+            function getMemories() {
+                if (cachedMemories !== null) return cachedMemories;
+                const stored = localStorage.getItem(MEMORIES_KEY);
+                return stored ? JSON.parse(stored) : DEFAULT_MEMORIES;
+            }
+
+            async function syncMemoriesFromFirebase() {
+                const remote = await fetchFirebaseData('memories');
+                if (remote && Array.isArray(remote)) {
+                    cachedMemories = remote;
+                    localStorage.setItem(MEMORIES_KEY, JSON.stringify(remote));
+                    loadMemories();
+                } else if (!localStorage.getItem(MEMORIES_KEY)) {
+                    saveFirebaseData('memories', DEFAULT_MEMORIES);
+                }
+            }
+
+            async function setMemories(memoriesList) {
+                cachedMemories = memoriesList;
+                localStorage.setItem(MEMORIES_KEY, JSON.stringify(memoriesList));
+                await saveFirebaseData('memories', memoriesList);
+                loadMemories();
+            }
+
+            // Sync with Firebase on page load
+            syncGamesFromFirebase();
+            syncMemoriesFromFirebase();
 
             // Helper to parse multiple tags (handles commas, hashtags, spaces)
             function parseTags(inputStr) {
@@ -1430,7 +1508,7 @@
 
                     const del = isLoggedIn() ? `<button data-idx="${index}" class="delete-game absolute top-2 right-2 w-7 h-7 rounded-full bg-rose-950/80 text-rose-400 hover:bg-rose-600 hover:text-white text-xs flex items-center justify-center transition-all border border-rose-500/30 z-10"><i class="fa-solid fa-trash-can"></i></button>` : '';
                     const card = document.createElement('div');
-                    card.className = `w-[260px] sm:w-[280px] lg:w-[258px] shrink-0 snap-start purple-glass rounded-3xl overflow-hidden hover:-translate-y-1.5 transition-all ${c.hover} relative group`;
+                    card.className = `w-[258px] shrink-0 snap-start purple-glass rounded-3xl overflow-hidden hover:-translate-y-1.5 transition-all ${c.hover} relative group`;
 
                     if (isLoggedIn()) {
                         card.setAttribute('draggable', 'true');
@@ -1458,8 +1536,7 @@
                             const draggedGame = currentGames.splice(draggedIdx, 1)[0];
                             currentGames.splice(index, 0, draggedGame);
 
-                            localStorage.setItem(GAMES_KEY, JSON.stringify(currentGames));
-                            renderGames();
+                            setGames(currentGames);
                         });
                     }
 
@@ -1470,8 +1547,8 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-purple-950/80 to-transparent"></div>
                             <span class="absolute bottom-2 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-black/50 ${c.text} backdrop-blur-sm border border-white/10">${safeName}</span>
                        </div>`
-                        : `<div class="h-20 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(30,10,60,0.8),rgba(10,20,40,0.8));">
-                            <i class="fa-solid ${safeIcon} text-3xl ${c.text} opacity-60"></i>
+                        : `<div class="h-36 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(30,10,60,0.8),rgba(10,20,40,0.8));">
+                            <i class="fa-solid ${safeIcon} text-4xl ${c.text} opacity-70"></i>
                        </div>`;
 
                     card.innerHTML = `
@@ -1493,8 +1570,7 @@
                         const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
                         const games = getGames();
                         games.splice(idx, 1);
-                        localStorage.setItem(GAMES_KEY, JSON.stringify(games));
-                        renderGames();
+                        setGames(games);
                     });
                 });
 
@@ -1509,8 +1585,7 @@
                             if (games[gIdx]) {
                                 games[gIdx].tags = games[gIdx].tags || [];
                                 games[gIdx].tags.push(...newTags);
-                                localStorage.setItem(GAMES_KEY, JSON.stringify(games));
-                                renderGames();
+                                setGames(games);
                             }
                         }
                     });
@@ -1524,8 +1599,7 @@
                         const games = getGames();
                         if (games[gIdx] && games[gIdx].tags) {
                             games[gIdx].tags.splice(tIdx, 1);
-                            localStorage.setItem(GAMES_KEY, JSON.stringify(games));
-                            renderGames();
+                            setGames(games);
                         }
                     });
                 });
@@ -1622,28 +1696,23 @@
                     const tags = parseTags(tagsInput);
                     const games = getGames();
                     games.push({ name, desc, icon, color, tags, image: selectedGameImage });
-                    try {
-                        localStorage.setItem(GAMES_KEY, JSON.stringify(games));
-                        addGameForm.reset();
-                        document.getElementById('game-icon').value = 'fa-gamepad';
-                        selectedGameImage = null;
-                        if (gameImgPreview) {
-                            gameImgPreview.innerHTML = `
-                            <i class="fa-solid fa-image text-2xl text-emerald-400/60"></i>
-                            <p class="text-xs text-slate-400 font-semibold">Click or drag & drop a game cover image</p>
-                            <p class="text-[10px] text-emerald-500/70">PNG, JPG, WEBP supported</p>
-                        `;
-                        }
-                        renderGames();
-                        // Scroll carousel to the right end where the new game was added
-                        const gridEl = document.getElementById('games-grid');
-                        if (gridEl) {
-                            setTimeout(() => {
-                                gridEl.scrollTo({ left: gridEl.scrollWidth, behavior: 'smooth' });
-                            }, 100);
-                        }
-                    } catch (err) {
-                        alert('Storage full! The uploaded image is too large for browser memory.');
+                    setGames(games);
+                    addGameForm.reset();
+                    document.getElementById('game-icon').value = 'fa-gamepad';
+                    selectedGameImage = null;
+                    if (gameImgPreview) {
+                        gameImgPreview.innerHTML = `
+                        <i class="fa-solid fa-image text-2xl text-emerald-400/60"></i>
+                        <p class="text-xs text-slate-400 font-semibold">Click or drag & drop a game cover image</p>
+                        <p class="text-[10px] text-emerald-500/70">PNG, JPG, WEBP supported</p>
+                    `;
+                    }
+                    // Scroll carousel to the right end where the new game was added
+                    const gridEl = document.getElementById('games-grid');
+                    if (gridEl) {
+                        setTimeout(() => {
+                            gridEl.scrollTo({ left: gridEl.scrollWidth, behavior: 'smooth' });
+                        }, 100);
                     }
                 });
             }
@@ -1706,11 +1775,6 @@
             ];
 
             let currentMemoryFilter = 'ALL';
-
-            function getMemories() {
-                const stored = localStorage.getItem(MEMORIES_KEY);
-                return stored ? JSON.parse(stored) : DEFAULT_MEMORIES;
-            }
 
             function populateGameCategoriesDatalist() {
                 const list = document.getElementById('game-categories-list');
@@ -1818,9 +1882,8 @@
                                     m.game = newName.trim();
                                 }
                             });
-                            localStorage.setItem(MEMORIES_KEY, JSON.stringify(mems));
                             currentMemoryFilter = newName.trim();
-                            loadMemories();
+                            setMemories(mems);
                         }
                     });
                 });
@@ -1833,9 +1896,8 @@
                         if (confirm(`Are you sure you want to delete category "${catName}" and ALL memories inside it?`)) {
                             let mems = getMemories();
                             mems = mems.filter(m => (m.game || '').trim().toLowerCase() !== catName.toLowerCase());
-                            localStorage.setItem(MEMORIES_KEY, JSON.stringify(mems));
                             currentMemoryFilter = 'ALL';
-                            loadMemories();
+                            setMemories(mems);
                         }
                     });
                 });
@@ -1897,8 +1959,7 @@
                         const targetIdx = realIdx >= 0 ? realIdx : mems.findIndex(m => m.title === data.title && m.thought === data.thought);
                         if (targetIdx > -1) {
                             mems.splice(targetIdx, 1);
-                            localStorage.setItem(MEMORIES_KEY, JSON.stringify(mems));
-                            loadMemories();
+                            setMemories(mems);
                         }
                     });
                 }
@@ -2004,20 +2065,13 @@
                     mems.unshift(newMem);
                     const status = document.getElementById('memory-form-status');
 
-                    try {
-                        localStorage.setItem(MEMORIES_KEY, JSON.stringify(mems));
-                        currentMemoryFilter = game; // Auto switch filter tab to the game category!
-                        loadMemories();
-                        memForm.reset();
-                        selectedImageData = null;
-                        document.getElementById('upload-preview').innerHTML = `<i class="fa-solid fa-image text-3xl text-purple-400"></i><p class="text-xs text-slate-300 font-semibold mt-2">Click or drag & drop a game screenshot here</p><p class="text-[10px] text-purple-300 mt-1">Supports PNG, JPG, JPEG, WEBP</p>`;
-                        status.className = 'text-center text-xs font-semibold text-emerald-400 pt-1';
-                        status.textContent = 'Published to vault! 🏆';
-                    } catch (err) {
-                        console.error(err);
-                        status.className = 'text-center text-xs font-semibold text-rose-400 pt-1';
-                        status.textContent = 'Browser storage quota exceeded! Please upload a smaller image file.';
-                    }
+                    currentMemoryFilter = game; // Auto switch filter tab to the game category!
+                    setMemories(mems);
+                    memForm.reset();
+                    selectedImageData = null;
+                    document.getElementById('upload-preview').innerHTML = `<i class="fa-solid fa-image text-3xl text-purple-400"></i><p class="text-xs text-slate-300 font-semibold mt-2">Click or drag & drop a game screenshot here</p><p class="text-[10px] text-purple-300 mt-1">Supports PNG, JPG, JPEG, WEBP</p>`;
+                    status.className = 'text-center text-xs font-semibold text-emerald-400 pt-1';
+                    status.textContent = 'Published to vault! 🏆';
                     setTimeout(() => status.textContent = '', 5000);
                 });
             }
