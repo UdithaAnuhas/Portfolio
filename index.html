@@ -2150,22 +2150,17 @@
                 });
             }
 
-            // ===== ANTI-INSPECT & RIGHT CLICK PROTECTION =====
-            // Disable right click context menu
-            document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-            // Disable developer shortcuts (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U)
-            document.addEventListener('keydown', (e) => {
-                if (
-                    e.key === 'F12' ||
-                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
-                    (e.ctrlKey && (e.key === 'U' || e.key === 'u'))
-                ) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    return false;
-                }
-            });
+            // ===== SCROLL REVEAL ANIMATIONS =====
+            const srElements = document.querySelectorAll('.sr');
+            const srObserver = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('sr-visible');
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+            srElements.forEach(el => srObserver.observe(el));
         });
     </script>
 </body>
