@@ -1329,12 +1329,22 @@
                 pwEyeIcon.className = isHidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
             });
 
-            // Login form submit
+            // Login form submit — with brute-force rate limiting
+            let loginAttempts = 0;
+            const MAX_LOGIN_ATTEMPTS = 5;
+            let loginLocked = false;
+
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if (loginLocked) {
+                    loginError.textContent = '🔒 Too many attempts. Try again in 1 minute.';
+                    loginError.classList.add('visible');
+                    return;
+                }
                 const entered = loginPasswordInput.value;
                 const hash = await sha256(entered);
                 if (hash === ADMIN_HASH) {
+                    loginAttempts = 0;
                     localStorage.setItem(SESSION_KEY, ADMIN_HASH);
                     closeLoginModal();
                     updateAdminUI();
@@ -1345,6 +1355,12 @@
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Access Granted!';
                     setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> Unlock Admin Panel'; }, 2000);
                 } else {
+                    loginAttempts++;
+                    if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                        loginLocked = true;
+                        loginError.textContent = '🔒 Too many failed attempts. Locked for 1 minute.';
+                        setTimeout(() => { loginAttempts = 0; loginLocked = false; loginError.textContent = 'Incorrect password. Please try again.'; }, 60000);
+                    }
                     loginError.classList.add('visible');
                     loginPasswordInput.classList.add('input-error');
                     loginPasswordInput.parentElement.classList.add('shake-anim');
@@ -1434,6 +1450,7 @@
             }
 
             async function setGames(gamesList) {
+                if (!isLoggedIn()) return; // Guard: only admin can write
                 cachedGames = gamesList;
                 localStorage.setItem(GAMES_KEY, JSON.stringify(gamesList));
                 await saveFirebaseData('games', gamesList);
@@ -1458,6 +1475,7 @@
             }
 
             async function setMemories(memoriesList) {
+                if (!isLoggedIn()) return; // Guard: only admin can write
                 cachedMemories = memoriesList;
                 localStorage.setItem(MEMORIES_KEY, JSON.stringify(memoriesList));
                 await saveFirebaseData('memories', memoriesList);
@@ -2105,10 +2123,14 @@
                             status.className = 'text-center text-xs font-semibold text-emerald-400 pt-1';
                             contactForm.reset();
                         } else {
-                            const data = await response.json();
-                            if (Object.hasOwn(data, 'errors')) {
-                                status.textContent = data["errors"].map(error => error["message"]).join(", ");
-                            } else {
+                            try {
+                                const data = await response.json();
+                                if (data && data.errors && Array.isArray(data.errors)) {
+                                    status.textContent = data.errors.map(error => error.message).join(", ");
+                                } else {
+                                    status.textContent = 'Oops! There was a problem submitting your form.';
+                                }
+                            } catch {
                                 status.textContent = 'Oops! There was a problem submitting your form.';
                             }
                             status.className = 'text-center text-xs font-semibold text-rose-400 pt-1';
