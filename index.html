@@ -307,11 +307,33 @@
         .sr-d3 {
             transition-delay: 0.36s !important;
         }
+
+        /* Prevent flash of unstyled content on reload */
+        body.loading {
+            opacity: 0 !important;
+        }
+        body.loaded {
+            opacity: 1 !important;
+            transition: opacity 0.15s ease-in;
+        }
     </style>
 </head>
 
 <body
-    class="bg-purple-950 text-slate-100 font-body antialiased selection:bg-purple-500 selection:text-white relative overflow-x-hidden">
+    class="bg-purple-950 text-slate-100 font-body antialiased selection:bg-purple-500 selection:text-white relative overflow-x-hidden loading">
+
+    <!-- Reveal body once Tailwind + fonts are ready -->
+    <script>
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.remove('loading');
+                document.body.classList.add('loaded');
+            });
+        } else {
+            document.body.classList.remove('loading');
+            document.body.classList.add('loaded');
+        }
+    </script>
 
     <!-- Ambient Orbs -->
     <div
@@ -1199,7 +1221,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // ===== CONSTANTS =====
-            const ADMIN_HASH = '79799e685861ab06d572dc3ad0c7d16b4202149a209ae157b5763a54f7b96ddb'; // SHA-256
+            const ADMIN_HASH = '6f95137c63fb5682cd54d5ac63ac3da874a4a418d1e2487034a0bcfed6616a5f'; // SHA-256
             const SESSION_KEY = 'aries-admin-session';
             const MEMORIES_KEY = 'aries-gaming-memories';
             const GAMES_KEY = 'aries-gaming-list';
@@ -1222,7 +1244,7 @@
 
             // ===== NAVBAR SCROLL =====
             const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
+            function updateNavbar() {
                 if (window.scrollY > 20) {
                     navbar.classList.add('bg-purple-950/90', 'backdrop-blur-xl', 'border-b-purple-500/20', 'shadow-lg', 'shadow-purple-950/50');
                     navbar.classList.remove('bg-transparent', 'border-b-transparent');
@@ -1230,7 +1252,9 @@
                     navbar.classList.remove('bg-purple-950/90', 'backdrop-blur-xl', 'border-b-purple-500/20', 'shadow-lg', 'shadow-purple-950/50');
                     navbar.classList.add('bg-transparent', 'border-b-transparent');
                 }
-            });
+            }
+            updateNavbar(); // Run immediately on load (fixes flash when reloading while scrolled)
+            window.addEventListener('scroll', updateNavbar);
 
             // ===== TYPING EFFECT =====
             const typingEl = document.getElementById('typing-text');
