@@ -426,6 +426,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applySavedBackground();
 
+  if (bgVideo) {
+    bgVideo.addEventListener('error', () => {
+      const source = bgVideo.querySelector('source');
+      if (source) {
+        source.src = 'assets/AnimeNature.mp4';
+        bgVideo.load();
+        bgVideo.play().catch(() => {});
+      }
+    }, true);
+  }
+
   // Open modal - Stays unlocked for current session until page refresh
   if (adminBtn && adminModal) {
     adminBtn.addEventListener('click', () => {
