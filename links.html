@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Uditha Anuhas (Aries) — Student Developer & Gamer. Find all my social links.">
+    <meta name="theme-color" content="#0a0015">
+    <meta property="og:title" content="Aries — Links">
+    <meta property="og:description" content="All my social links in one place.">
+    <meta property="og:type" content="website">
+    <title>Aries — Links ✦</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Page Styles -->
+    <link rel="stylesheet" href="links.css">
+</head>
+
+<body class="links-page">
+
+    <!-- ===== Fullscreen Video Background ===== -->
+    <div class="bg-fullscreen">
+        <video autoplay muted loop playsinline id="bg-video">
+            <source src="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Anime.Nature.mp4" type="video/mp4">
+        </video>
+    </div>
+    <div class="bg-overlay"></div>
+
+    <!-- ===== Particles ===== -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- ===== Click to Enter Overlay (Guns.lol Style) ===== -->
+    <div class="enter-overlay" id="enter-overlay">
+        <div class="enter-content">
+            <span class="enter-text">✦ click anywhere to enter ✦</span>
+        </div>
+    </div>
+
+    <!-- ===== Audio Toggle (Top Left) ===== -->
+    <button class="audio-toggle" id="audio-toggle" aria-label="Toggle music" title="Toggle Music">
+        <i class="fa-solid fa-volume-xmark" id="audio-icon"></i>
+    </button>
+
+    <!-- ===== Admin Controls (Top Right) ===== -->
+    <button class="admin-btn" id="admin-btn" aria-label="Admin settings" title="Admin Background Settings">
+        <i class="fa-solid fa-sliders" id="admin-icon"></i>
+    </button>
+
+    <!-- ===== Admin Background Modal ===== -->
+    <div class="admin-modal" id="admin-modal">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Admin Background Controls</h3>
+                <button class="admin-modal-close" id="admin-modal-close">&times;</button>
+            </div>
+            <div class="admin-modal-body">
+                <!-- Login View -->
+                <div id="admin-login-view">
+                    <p class="admin-modal-desc">Enter admin password to customize the background:</p>
+                    <input type="password" id="admin-pass-input" placeholder="Enter Admin Password..." class="admin-input">
+                    <button id="admin-login-btn" class="admin-action-btn">Unlock Controls</button>
+                    <p id="admin-login-err" class="admin-err-msg"></p>
+                </div>
+                <!-- Controls View -->
+                <div id="admin-controls-view" style="display: none;">
+                    <label class="admin-label">Preset Videos:</label>
+                    <select id="bg-preset-select" class="admin-select">
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Anime.Nature.mp4">Anime Nature</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Anime.gurl.mp4">Anime Girl</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/anime.2.mp4">Anime 2</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Jujustu.Kaisen.mp4">Jujutsu Kaisen</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Naruto.mp4">Naruto</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Spider.Man.mp4">Spider Man</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/Spider-Man02.mp4">Spider Man 02</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/4K.Universe01_90.mp4">Universe 4K (01)</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/latest/download/4K.Universe02_90.mp4">Universe 4K (02)</option>
+                        <option value="custom">-- Custom Video URL --</option>
+                    </select>
+
+                    <div id="custom-url-wrapper" style="display: none; margin-top: 10px;">
+                        <label class="admin-label">Custom Video URL (GitHub / CDN):</label>
+                        <input type="url" id="custom-video-url" placeholder="https://..." class="admin-input">
+                    </div>
+
+                    <label class="admin-label" style="margin-top: 14px;">Rotation Orientation:</label>
+                    <select id="bg-rotation-select" class="admin-select">
+                        <option value="270deg">270° (Flipped Landscape)</option>
+                        <option value="90deg">90° (Clockwise Landscape)</option>
+                        <option value="0deg">0° (Original Portrait)</option>
+                    </select>
+
+                    <button id="admin-save-bg-btn" class="admin-action-btn" style="margin-top: 18px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Apply & Save Background
+                    </button>
+                    <p id="admin-save-msg" class="admin-success-msg"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Main Content ===== -->
+    <main class="links-container">
+
+        <!-- Avatar -->
+        <div class="avatar-wrapper fade-in delay-1">
+            <div class="avatar-ring">
+                <img src="assets/avatar.jpg" alt="Aries">
+            </div>
+        </div>
+
+        <!-- Username -->
+        <h1 class="profile-username fade-in delay-2">Uditha Anuhas</h1>
+
+        <!-- Bio / Typewriter -->
+        <div class="profile-bio fade-in delay-3">
+            <span id="bio-text"></span><span class="cursor-blink"></span>
+        </div>
+
+        <!-- Location -->
+        <div class="profile-location fade-in delay-3">
+            <span class="location-dot"></span>
+            Sri Lanka
+        </div>
+
+        <!-- Discord Status Widget (High Visibility Glass Card) -->
+        <div class="discord-widget fade-in delay-4">
+            <div class="discord-avatar-container">
+                <img src="assets/avatar.jpg" alt="Discord Avatar" class="discord-avatar" id="discord-avatar-img">
+                <span class="discord-status-dot" id="discord-dot"></span>
+            </div>
+            <div class="discord-info">
+                <div class="discord-name-row">
+                    <span class="discord-name" id="discord-username">Aries</span>
+                    <span class="discord-status-badge" id="discord-status-badge">Online</span>
+                </div>
+                <span class="discord-activity-text" id="discord-activity">
+                    <i class="fa-solid fa-gamepad"></i> Playing Valorant
+                </span>
+            </div>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="social-icons fade-in delay-5">
+            <a href="https://discord.gg/QFZqrgqRv4" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--discord" title="Discord">
+                <i class="fa-brands fa-discord"></i>
+            </a>
+            <a href="https://github.com/UdithaAnuhas" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--github" title="GitHub">
+                <i class="fa-brands fa-github"></i>
+            </a>
+            <a href="https://steamcommunity.com/id/uditha_anuhas/" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--steam" title="Steam">
+                <i class="fa-brands fa-steam"></i>
+            </a>
+            <a href="mailto:anuhas.ekanayaka320@gmail.com"
+                class="social-icon social-icon--email" title="Email">
+                <i class="fa-solid fa-envelope"></i>
+            </a>
+            <a href="index.html"
+                class="social-icon social-icon--portfolio" title="Portfolio">
+                <i class="fa-solid fa-rocket"></i>
+            </a>
+        </div>
+
+        <!-- Visitor Counter -->
+        <div class="visitor-counter fade-in delay-6">
+            <i class="fa-solid fa-eye"></i>
+            <span id="visitor-count">0</span>
+        </div>
+
+    </main>
+
+    <!-- ===== Scripts ===== -->
+    <script src="links.js"></script>
+
+</body>
+
+</html>
