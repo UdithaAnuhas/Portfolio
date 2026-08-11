@@ -1,3 +1,0 @@
-# Ignore large video files — served via GitHub Releases CDN
-*.mp4
-*.webm
