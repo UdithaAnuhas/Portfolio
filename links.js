@@ -430,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bgVideo.addEventListener('error', () => {
       const source = bgVideo.querySelector('source');
       if (source) {
-        source.src = 'assets/AnimeNature.mp4';
+        source.src = 'https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Anime.Nature.mp4';
         bgVideo.load();
         bgVideo.play().catch(() => {});
       }
