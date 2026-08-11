@@ -312,6 +312,7 @@
         body.loading {
             opacity: 0 !important;
         }
+
         body.loaded {
             opacity: 1 !important;
             transition: opacity 0.15s ease-in;
@@ -325,7 +326,7 @@
     <!-- Reveal body once Tailwind + fonts are ready -->
     <script>
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 document.body.classList.remove('loading');
                 document.body.classList.add('loaded');
             });
@@ -415,6 +416,7 @@
                 <a href="#gaming" class="hover:text-emerald-400 transition-colors py-1">Games</a>
                 <a href="#memories" class="hover:text-amber-400 transition-colors py-1">Vault</a>
                 <a href="#connect" class="hover:text-purple-300 transition-colors py-1">Connect</a>
+                <a href="links.html" class="hover:text-purple-300 transition-colors py-1 text-purple-300 font-bold"><i class="fa-solid fa-link mr-1 text-xs"></i> Links</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -424,6 +426,12 @@
                     <button id="logout-btn"
                         class="text-[11px] text-slate-400 hover:text-rose-400 transition-colors font-semibold">Logout</button>
                 </div>
+
+                <!-- Link Page button -->
+                <a href="links.html"
+                    class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full purple-gradient-bg text-white font-semibold text-xs shadow-purple-btn hover:shadow-purple-glow hover:scale-105 transition-all">
+                    <i class="fa-solid fa-link text-[10px]"></i> My Links
+                </a>
 
                 <!-- Login trigger button (shown when logged out) -->
                 <button id="admin-login-trigger"
@@ -451,6 +459,8 @@
             <a href="#gaming" class="block text-slate-200 font-medium hover:text-emerald-400">Games</a>
             <a href="#memories" class="block text-slate-200 font-medium hover:text-amber-400">Vault</a>
             <a href="#connect" class="block text-slate-200 font-medium hover:text-purple-300">Connect</a>
+            <a href="links.html" class="block text-purple-300 font-bold hover:text-purple-200"><i
+                    class="fa-solid fa-link mr-1"></i> My Links</a>
         </div>
     </header>
 
