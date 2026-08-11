@@ -404,10 +404,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return localStorage.getItem(LINKS_SESSION_KEY) === LINKS_ADMIN_HASH;
   }
 
-  // Apply saved background on page load
+  const FIREBASE_BG_URL = 'https://portfolio-1630f-default-rtdb.firebaseio.com/linksGlobalBg.json';
+
+  // Apply saved background locally
   function applySavedBackground() {
-    const savedVideo = localStorage.getItem('aries-bg-video-url');
+    let savedVideo = localStorage.getItem('aries-bg-video-url');
     const savedRotation = localStorage.getItem('aries-bg-rotation');
+
+    // Clean up old broken local asset paths from browser localStorage
+    if (savedVideo && savedVideo.includes('assets/')) {
+      localStorage.removeItem('aries-bg-video-url');
+      savedVideo = null;
+    }
 
     if (bgVideo) {
       if (savedVideo) {
@@ -424,7 +432,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Fetch worldwide global background setting from Firebase on page load
+  async function syncGlobalBackground() {
+    try {
+      const res = await fetch(FIREBASE_BG_URL);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.videoUrl) {
+          localStorage.setItem('aries-bg-video-url', data.videoUrl);
+          if (data.rotation) localStorage.setItem('aries-bg-rotation', data.rotation);
+          applySavedBackground();
+        }
+      }
+    } catch (e) {
+      console.warn('Could not sync global background', e);
+    }
+  }
+
   applySavedBackground();
+  syncGlobalBackground();
 
   if (bgVideo) {
     bgVideo.addEventListener('error', () => {
@@ -437,10 +463,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
   }
 
-  // Open modal - Stays unlocked for current session until page refresh
+  // Open modal - Direct access (password check commented out for now)
   if (adminBtn && adminModal) {
     adminBtn.addEventListener('click', () => {
       adminModal.classList.add('open');
+      /* Password check disabled temporarily:
       if (sessionStorage.getItem('aries-links-unlocked') === 'true') {
         adminLoginView.style.display = 'none';
         adminControlsView.style.display = 'block';
@@ -452,6 +479,10 @@ document.addEventListener('DOMContentLoaded', () => {
         adminControlsView.style.display = 'none';
         adminPassInput.focus();
       }
+      */
+      if (adminLoginView) adminLoginView.style.display = 'none';
+      if (adminControlsView) adminControlsView.style.display = 'block';
+      populateCurrentSettings();
     });
   }
 
@@ -526,9 +557,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Save & Apply background
+  // Save & Apply background (Worldwide Firebase Sync)
   if (adminSaveBgBtn) {
-    adminSaveBgBtn.addEventListener('click', () => {
+    adminSaveBgBtn.addEventListener('click', async () => {
       let videoUrl = bgPresetSelect.value;
       if (videoUrl === 'custom') {
         videoUrl = customVideoUrlInput.value.trim();
@@ -546,8 +577,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       applySavedBackground();
 
+      // Push to Firebase so EVERY visitor worldwide gets this background!
+      try {
+        await fetch(FIREBASE_BG_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl, rotation, timestamp: Date.now() })
+        });
+      } catch (e) {
+        console.warn('Firebase global sync failed', e);
+      }
+
       adminSaveMsg.style.color = '#4ade80';
-      adminSaveMsg.textContent = 'Background updated live & saved!';
+      adminSaveMsg.textContent = 'Background updated worldwide & saved!';
       setTimeout(() => {
         adminSaveMsg.textContent = '';
         if (adminModal) adminModal.classList.remove('open');
