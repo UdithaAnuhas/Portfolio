@@ -4,6 +4,17 @@
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  window.name = 'aries_links_tab';
+
+  // Smart Tab Focus back to Portfolio tab
+  const portfolioBtn = document.querySelector('a[href="index.html"]');
+  if (portfolioBtn) {
+    portfolioBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const win = window.open('index.html', 'aries_portfolio_tab');
+      if (win) win.focus();
+    });
+  }
 
   // ═════════════════════════════════════════════
   // 1. PARTICLE SYSTEM (Subtle floating dots)
@@ -134,11 +145,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const discordStatusBadge = document.getElementById('discord-status-badge');
 
   const statusBadgeStyles = {
-    online:  { bg: 'rgba(34, 197, 94, 0.18)', border: 'rgba(34, 197, 94, 0.35)', color: '#4ade80', label: 'Online' },
-    idle:    { bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.35)', color: '#fbbf24', label: 'Idle' },
-    dnd:     { bg: 'rgba(239, 68, 68, 0.18)', border: 'rgba(239, 68, 68, 0.35)', color: '#f87171', label: 'DND' },
+    online: { bg: 'rgba(34, 197, 94, 0.18)', border: 'rgba(34, 197, 94, 0.35)', color: '#4ade80', label: 'Online' },
+    idle: { bg: 'rgba(245, 158, 11, 0.18)', border: 'rgba(245, 158, 11, 0.35)', color: '#fbbf24', label: 'Idle' },
+    dnd: { bg: 'rgba(239, 68, 68, 0.18)', border: 'rgba(239, 68, 68, 0.35)', color: '#f87171', label: 'DND' },
     offline: { bg: 'rgba(107, 114, 128, 0.18)', border: 'rgba(107, 114, 128, 0.35)', color: '#9ca3af', label: 'Offline' }
   };
+
+  function escapeHtmlStr(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
 
   function updateDiscordUI(data) {
     if (!discordActivityEl) return;
@@ -146,8 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = data.discord_status || 'offline';
     const color = statusColors[status] || statusColors.offline;
     const badgeStyle = statusBadgeStyles[status] || statusBadgeStyles.offline;
-
-    // Always keep local avatar — don't override with Discord CDN
 
     // Update username if provided
     if (data.discord_user && discordUsername) {
@@ -175,25 +191,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const codeActivity = activities.find(a => a.name === 'Visual Studio Code' || a.name === 'Code');
 
     if (data.listening_to_spotify && data.spotify) {
-      discordActivityEl.innerHTML = `<i class="fa-brands fa-spotify" style="color:#1DB954; font-size: 0.9rem;"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${data.spotify.song} — ${data.spotify.artist}</span>`;
+      const song = escapeHtmlStr(data.spotify.song);
+      const artist = escapeHtmlStr(data.spotify.artist);
+      discordActivityEl.innerHTML = `<i class="fa-brands fa-spotify" style="color:#1DB954; font-size: 0.9rem;"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${song} — ${artist}</span>`;
     } else if (customStatus && customStatus.state) {
-      // Build emoji: use Discord CDN for custom emojis, or Unicode name directly
       let emojiHTML = '';
       if (customStatus.emoji) {
         if (customStatus.emoji.id) {
-          // Custom Discord emoji — render as image
-          emojiHTML = `<img src="https://cdn.discordapp.com/emojis/${customStatus.emoji.id}.webp?size=20" alt="${customStatus.emoji.name}" style="width:18px;height:18px;vertical-align:middle;margin-right:4px;">`;
+          const safeEmojiId = encodeURIComponent(customStatus.emoji.id);
+          const safeEmojiName = escapeHtmlStr(customStatus.emoji.name);
+          emojiHTML = `<img src="https://cdn.discordapp.com/emojis/${safeEmojiId}.webp?size=20" alt="${safeEmojiName}" style="width:18px;height:18px;vertical-align:middle;margin-right:4px;">`;
         } else {
-          // Unicode emoji
-          emojiHTML = customStatus.emoji.name + ' ';
+          emojiHTML = escapeHtmlStr(customStatus.emoji.name) + ' ';
         }
       }
-      discordActivityEl.innerHTML = `${emojiHTML}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${customStatus.state}</span>`;
+      const safeState = escapeHtmlStr(customStatus.state);
+      discordActivityEl.innerHTML = `${emojiHTML}<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeState}</span>`;
     } else if (gameActivity) {
-      discordActivityEl.innerHTML = `<i class="fa-solid fa-gamepad"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Playing ${gameActivity.name}</span>`;
+      const safeGameName = escapeHtmlStr(gameActivity.name);
+      discordActivityEl.innerHTML = `<i class="fa-solid fa-gamepad"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Playing ${safeGameName}</span>`;
     } else if (codeActivity) {
-      const details = codeActivity.details ? ` — ${codeActivity.details}` : '';
-      discordActivityEl.innerHTML = `<i class="fa-solid fa-code"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${codeActivity.name}${details}</span>`;
+      const safeCodeName = escapeHtmlStr(codeActivity.name);
+      const details = codeActivity.details ? ` — ${escapeHtmlStr(codeActivity.details)}` : '';
+      discordActivityEl.innerHTML = `<i class="fa-solid fa-code"></i> <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeCodeName}${details}</span>`;
     } else {
       const labels = { online: 'Online', idle: 'Away', dnd: 'Do Not Disturb', offline: 'Offline' };
       discordActivityEl.innerHTML = `${labels[status] || 'Offline'}`;
@@ -256,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch(`https://api.lanyard.rest/v1/users/${DISCORD_USER_ID}`)
               .then(r => r.json())
               .then(j => { if (j.success) updateDiscordUI(j.data); })
-              .catch(() => {});
+              .catch(() => { });
           }, 30000);
         } else {
           startFallback();
@@ -283,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function enableSound() {
       if (bgVideo) {
         bgVideo.muted = false;
-        bgVideo.play().catch(() => {});
+        bgVideo.play().catch(() => { });
       }
       if (audioIcon) audioIcon.className = 'fa-solid fa-volume-high';
       if (audioToggle) audioToggle.classList.add('playing');
@@ -373,8 +393,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ═════════════════════════════════════════════
   // 6. ADMIN BACKGROUND CONTROLS
   // ═════════════════════════════════════════════
-  // Separate password for links page background controls (password: 0000)
-  const LINKS_ADMIN_HASH = '9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0';
+  // Separate password for links page background controls (password: 0000 or Manvisalacariyek)
+  const LINKS_ADMIN_HASH = '9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0'; // SHA-256 for 0000
+  const MANVISAL_HASH = '6f95137c63fb5682cd54d5ac63ac3da874a4a418d1e2487034a0bcfed6616a5f'; // SHA-256 for Manvisalacariyek
   const LINKS_SESSION_KEY = 'aries-links-admin-session';
 
   const adminBtn = document.getElementById('admin-btn');
@@ -389,6 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const customUrlWrapper = document.getElementById('custom-url-wrapper');
   const customVideoUrlInput = document.getElementById('custom-video-url');
   const bgRotationSelect = document.getElementById('bg-rotation-select');
+  const passProtectToggle = document.getElementById('pass-protect-toggle');
   const adminSaveBgBtn = document.getElementById('admin-save-bg-btn');
   const adminSaveMsg = document.getElementById('admin-save-msg');
 
@@ -404,10 +426,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return localStorage.getItem(LINKS_SESSION_KEY) === LINKS_ADMIN_HASH;
   }
 
-  // Apply saved background on page load
+  const FIREBASE_BG_URL = 'https://portfolio-1630f-default-rtdb.firebaseio.com/linksGlobalBg.json';
+  const FIREBASE_PASS_PROTECT_URL = 'https://portfolio-1630f-default-rtdb.firebaseio.com/linksPassProtect.json';
+
+  // Apply saved background locally
   function applySavedBackground() {
-    const savedVideo = localStorage.getItem('aries-bg-video-url');
+    let savedVideo = localStorage.getItem('aries-bg-video-url');
     const savedRotation = localStorage.getItem('aries-bg-rotation');
+
+    // Clean up old broken local asset paths from browser localStorage
+    if (savedVideo && savedVideo.includes('assets/')) {
+      localStorage.removeItem('aries-bg-video-url');
+      savedVideo = null;
+    }
 
     if (bgVideo) {
       if (savedVideo) {
@@ -415,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (source && source.src !== savedVideo) {
           source.src = savedVideo;
           bgVideo.load();
-          bgVideo.play().catch(() => {});
+          bgVideo.play().catch(() => { });
         }
       }
       if (savedRotation) {
@@ -424,38 +455,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Fetch worldwide global background setting & password protection setting from Firebase on page load
+  async function syncGlobalSettings() {
+    try {
+      const [bgRes, passRes] = await Promise.all([
+        fetch(FIREBASE_BG_URL).catch(() => null),
+        fetch(FIREBASE_PASS_PROTECT_URL).catch(() => null)
+      ]);
+
+      if (bgRes && bgRes.ok) {
+        const data = await bgRes.json();
+        if (data && data.videoUrl) {
+          localStorage.setItem('aries-bg-video-url', data.videoUrl);
+          if (data.rotation) localStorage.setItem('aries-bg-rotation', data.rotation);
+          applySavedBackground();
+        }
+      }
+
+      if (passRes && passRes.ok) {
+        const passData = await passRes.json();
+        if (passData !== null && passData !== undefined) {
+          const isEnabled = typeof passData === 'boolean' ? passData : passData.enabled;
+          localStorage.setItem('aries-links-pass-protect', isEnabled ? 'true' : 'false');
+        }
+      }
+    } catch (e) {
+      console.warn('Could not sync global settings', e);
+    }
+  }
+
   applySavedBackground();
+  syncGlobalSettings();
 
   if (bgVideo) {
     bgVideo.addEventListener('error', () => {
       const source = bgVideo.querySelector('source');
       if (source) {
-        source.src = 'assets/AnimeNature.mp4';
+        source.src = 'https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Anime.Nature.mp4';
         bgVideo.load();
-        bgVideo.play().catch(() => {});
+        bgVideo.play().catch(() => { });
       }
     }, true);
   }
 
-  // Open modal - Stays unlocked for current session until page refresh
+  // Open modal (Check slider toggle state: if enabled, demand password; if disabled, open directly)
   if (adminBtn && adminModal) {
     adminBtn.addEventListener('click', () => {
       adminModal.classList.add('open');
-      if (sessionStorage.getItem('aries-links-unlocked') === 'true') {
-        adminLoginView.style.display = 'none';
-        adminControlsView.style.display = 'block';
-        populateCurrentSettings();
+      const isProtectEnabled = localStorage.getItem('aries-links-pass-protect') === 'true';
+
+      if (isProtectEnabled) {
+        if (sessionStorage.getItem('aries-links-unlocked') === 'true') {
+          if (adminLoginView) adminLoginView.style.display = 'none';
+          if (adminControlsView) adminControlsView.style.display = 'block';
+          populateCurrentSettings();
+        } else {
+          if (adminPassInput) adminPassInput.value = '';
+          if (adminLoginErr) adminLoginErr.textContent = '';
+          if (adminLoginView) adminLoginView.style.display = 'block';
+          if (adminControlsView) adminControlsView.style.display = 'none';
+          if (adminPassInput) adminPassInput.focus();
+        }
       } else {
-        adminPassInput.value = '';
-        adminLoginErr.textContent = '';
-        adminLoginView.style.display = 'block';
-        adminControlsView.style.display = 'none';
-        adminPassInput.focus();
+        if (adminLoginView) adminLoginView.style.display = 'none';
+        if (adminControlsView) adminControlsView.style.display = 'block';
+        populateCurrentSettings();
       }
     });
   }
 
-  // Pre-populate dropdowns with active saved background settings
+  // Pre-populate dropdowns & toggle slider with active saved settings
   function populateCurrentSettings() {
     const savedVideo = localStorage.getItem('aries-bg-video-url');
     const savedRotation = localStorage.getItem('aries-bg-rotation');
@@ -474,6 +543,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedRotation && bgRotationSelect) {
       bgRotationSelect.value = savedRotation;
     }
+    if (passProtectToggle) {
+      passProtectToggle.checked = (localStorage.getItem('aries-links-pass-protect') === 'true');
+    }
   }
 
   // Close modal on X or clicking backdrop outside modal content
@@ -490,19 +562,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Admin login check (Password: 0000)
+  // Admin login check (Supports both 0000 and Manvisalacariyek)
   async function performAdminLogin() {
     const pass = adminPassInput.value.trim();
     if (!pass) return;
     const hash = await sha256(pass);
-    if (hash === LINKS_ADMIN_HASH) {
+    if (hash === LINKS_ADMIN_HASH || hash === MANVISAL_HASH) {
       sessionStorage.setItem('aries-links-unlocked', 'true');
-      adminLoginErr.textContent = '';
-      adminLoginView.style.display = 'none';
-      adminControlsView.style.display = 'block';
+      if (adminLoginErr) adminLoginErr.textContent = '';
+      if (adminLoginView) adminLoginView.style.display = 'none';
+      if (adminControlsView) adminControlsView.style.display = 'block';
       populateCurrentSettings();
     } else {
-      adminLoginErr.textContent = 'Invalid password!';
+      if (adminLoginErr) adminLoginErr.textContent = 'Invalid password!';
     }
   }
 
@@ -526,9 +598,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Save & Apply background
+  // Save & Apply background + Password protection setting (Worldwide Sync)
   if (adminSaveBgBtn) {
-    adminSaveBgBtn.addEventListener('click', () => {
+    adminSaveBgBtn.addEventListener('click', async () => {
       let videoUrl = bgPresetSelect.value;
       if (videoUrl === 'custom') {
         videoUrl = customVideoUrlInput.value.trim();
@@ -541,13 +613,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Save local preferences
       localStorage.setItem('aries-bg-video-url', videoUrl);
       localStorage.setItem('aries-bg-rotation', rotation);
 
       applySavedBackground();
 
+      // Push to Firebase so EVERY visitor worldwide gets this background!
+      try {
+        await fetch(FIREBASE_BG_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl, rotation, timestamp: Date.now() })
+        });
+      } catch (e) {
+        console.warn('Firebase global sync failed', e);
+      }
+
       adminSaveMsg.style.color = '#4ade80';
-      adminSaveMsg.textContent = 'Background updated live & saved!';
+      adminSaveMsg.textContent = 'Background updated worldwide & saved!';
       setTimeout(() => {
         adminSaveMsg.textContent = '';
         if (adminModal) adminModal.classList.remove('open');

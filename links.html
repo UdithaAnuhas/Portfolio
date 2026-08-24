@@ -21,12 +21,40 @@
     <link rel="stylesheet" href="links.css">
 </head>
 
-<body class="links-page">
+<body class="links-page" style="background-color: #0a0015; color: #ffffff;">
+
+    <!-- ===== Preloader Screen (Instant Dark & Spinner for Slow Connections) ===== -->
+    <div id="page-preloader" style="position: fixed; inset: 0; z-index: 999999; background: #0a0015; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; transition: opacity 0.4s ease, visibility 0.4s ease;">
+        <div style="width: 44px; height: 44px; border: 3px solid rgba(168, 85, 247, 0.2); border-top-color: #a855f7; border-radius: 50%; animation: preloaderSpin 0.75s linear infinite;"></div>
+        <span style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600; color: #c084fc; letter-spacing: 2px; text-transform: uppercase;">Aries ✦</span>
+    </div>
+    <style>
+        @keyframes preloaderSpin { to { transform: rotate(360deg); } }
+    </style>
+    <script>
+        window.addEventListener('load', function() {
+            var p = document.getElementById('page-preloader');
+            if (p) {
+                p.style.opacity = '0';
+                p.style.visibility = 'hidden';
+                setTimeout(function() { p.remove(); }, 450);
+            }
+        });
+        // Fallback safety timeout if video takes long
+        setTimeout(function() {
+            var p = document.getElementById('page-preloader');
+            if (p) {
+                p.style.opacity = '0';
+                p.style.visibility = 'hidden';
+                setTimeout(function() { p.remove(); }, 450);
+            }
+        }, 2000);
+    </script>
 
     <!-- ===== Fullscreen Video Background ===== -->
     <div class="bg-fullscreen">
         <video autoplay muted loop playsinline id="bg-video">
-            <source src="assets/AnimeNature.mp4" type="video/mp4">
+            <source src="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Anime.Nature.mp4" type="video/mp4">
         </video>
     </div>
     <div class="bg-overlay"></div>
@@ -70,13 +98,15 @@
                 <div id="admin-controls-view" style="display: none;">
                     <label class="admin-label">Preset Videos:</label>
                     <select id="bg-preset-select" class="admin-select">
-                        <option value="assets/AnimeNature.mp4">Anime Nature</option>
-                        <option value="assets/AnimeGirl.mp4">Anime Girl</option>
-                        <option value="assets/JujutsuKaisen.mp4">Jujutsu Kaisen</option>
-                        <option value="assets/Naruto.mp4">Naruto</option>
-                        <option value="assets/SpiderMan02.mp4">Spider Man 02</option>
-                        <option value="assets/Universe01.mp4">Universe 4K (01)</option>
-                        <option value="assets/Universe02.mp4">Universe 4K (02)</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Anime.Nature.mp4">Anime Nature</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Anime.gurl.mp4">Anime Girl</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/anime.2.mp4">Anime 2</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Jujustu.Kaisen.mp4">Jujutsu Kaisen</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Naruto.mp4">Naruto</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Spider.Man.mp4">Spider Man 01</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/Spider-Man02.mp4">Spider Man 02</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/4K.Universe01_90.mp4">Universe 4K (01)</option>
+                        <option value="https://github.com/UdithaAnuhas/Portfolio/releases/download/v1.0/4K.Universe02_90.mp4">Universe 4K (02)</option>
                         <option value="custom">-- Custom Video URL --</option>
                     </select>
 
@@ -126,26 +156,28 @@
         </div>
 
         <!-- Discord Status Widget (High Visibility Glass Card) -->
-        <div class="discord-widget fade-in delay-4">
-            <div class="discord-avatar-container">
-                <img src="assets/avatar.jpg" alt="Discord Avatar" class="discord-avatar" id="discord-avatar-img">
-                <span class="discord-status-dot" id="discord-dot"></span>
-            </div>
-            <div class="discord-info">
-                <div class="discord-name-row">
-                    <span class="discord-name" id="discord-username">Aries</span>
-                    <span class="discord-status-badge" id="discord-status-badge">Online</span>
+        <a href="https://discord.com/users/1445792800699584677" target="_blank" rel="noopener noreferrer" class="discord-widget-link fade-in delay-4" title="Open Discord Profile">
+            <div class="discord-widget">
+                <div class="discord-avatar-container">
+                    <img src="assets/avatar.jpg" alt="Discord Avatar" class="discord-avatar" id="discord-avatar-img">
+                    <span class="discord-status-dot" id="discord-dot"></span>
                 </div>
-                <span class="discord-activity-text" id="discord-activity">
-                    <i class="fa-solid fa-gamepad"></i> Playing Valorant
-                </span>
+                <div class="discord-info">
+                    <div class="discord-name-row">
+                        <span class="discord-name" id="discord-username">Aries</span>
+                        <span class="discord-status-badge" id="discord-status-badge">Online</span>
+                    </div>
+                    <span class="discord-activity-text" id="discord-activity">
+                        <i class="fa-solid fa-gamepad"></i> Playing Valorant
+                    </span>
+                </div>
             </div>
-        </div>
+        </a>
 
         <!-- Social Icons -->
         <div class="social-icons fade-in delay-5">
-            <a href="https://discord.gg/QFZqrgqRv4" target="_blank" rel="noopener noreferrer"
-                class="social-icon social-icon--discord" title="Discord">
+            <a href="https://discord.com/users/1445792800699584677" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--discord" title="Discord Profile">
                 <i class="fa-brands fa-discord"></i>
             </a>
             <a href="https://github.com/UdithaAnuhas" target="_blank" rel="noopener noreferrer"
@@ -156,15 +188,47 @@
                 class="social-icon social-icon--steam" title="Steam">
                 <i class="fa-brands fa-steam"></i>
             </a>
-            <a href="mailto:anuhas.ekanayaka320@gmail.com"
-                class="social-icon social-icon--email" title="Email">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--instagram" title="Instagram">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--facebook" title="Facebook">
+                <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="https://reddit.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--reddit" title="Reddit">
+                <i class="fa-brands fa-reddit-alien"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--linkedin" title="LinkedIn">
+                <i class="fa-brands fa-linkedin-in"></i>
+            </a>
+            <a href="https://spotify.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--spotify" title="Spotify">
+                <i class="fa-brands fa-spotify"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--youtube" title="YouTube">
+                <i class="fa-brands fa-youtube"></i>
+            </a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=anuhas.ekanayaka320@gmail.com" target="_blank" rel="noopener noreferrer"
+                class="social-icon social-icon--email" title="Compose Gmail">
                 <i class="fa-solid fa-envelope"></i>
             </a>
-            <a href="index.html"
-                class="social-icon social-icon--portfolio" title="Portfolio">
-                <i class="fa-solid fa-rocket"></i>
-            </a>
         </div>
+
+        <!-- Long Separate Portfolio Button -->
+        <a href="index.html" target="aries_portfolio_tab" rel="noopener" class="portfolio-action-btn fade-in delay-6" title="Explore My World">
+            <div class="portfolio-btn-content">
+                <i class="fa-solid fa-rocket portfolio-btn-icon"></i>
+                <div class="portfolio-btn-text">
+                    <span class="portfolio-btn-title">Explore My World</span>
+                    <span class="portfolio-btn-subtitle">Games I play, Coding projects & Memory vault</span>
+                </div>
+                <i class="fa-solid fa-chevron-right portfolio-btn-arrow"></i>
+            </div>
+        </a>
 
         <!-- Visitor Counter -->
         <div class="visitor-counter fade-in delay-6">
