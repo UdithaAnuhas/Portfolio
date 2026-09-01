@@ -334,6 +334,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+
+    // Smart Tab Switch: Pause music and video when switching away, auto-resume when returning
+    let wasPlayingBeforeHidden = false;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (!bgVideo.paused) {
+          wasPlayingBeforeHidden = true;
+          bgVideo.pause(); // Pauses video and music playback instantly
+        }
+      } else {
+        if (wasPlayingBeforeHidden) {
+          wasPlayingBeforeHidden = false;
+          bgVideo.play().catch(() => { }); // Resumes right where left off
+        }
+      }
+    });
   }
 
   // ═════════════════════════════════════════════
@@ -474,9 +490,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (passRes && passRes.ok) {
         const passData = await passRes.json();
-        if (passData !== null && passData !== undefined) {
-          const isEnabled = typeof passData === 'boolean' ? passData : passData.enabled;
-          localStorage.setItem('aries-links-pass-protect', isEnabled ? 'true' : 'false');
+        // Handle all cases: true means enabled, everything else means disabled
+        if (passData === true) {
+          localStorage.setItem('aries-links-pass-protect', 'true');
+        } else {
+          localStorage.setItem('aries-links-pass-protect', 'false');
         }
       }
     } catch (e) {
@@ -508,11 +526,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const passRes = await fetch(FIREBASE_PASS_PROTECT_URL).catch(() => null);
         if (passRes && passRes.ok) {
           const passData = await passRes.json();
-          if (passData !== null && passData !== undefined) {
-            const isEnabled = typeof passData === 'boolean' ? passData : passData.enabled;
-            localStorage.setItem('aries-links-pass-protect', isEnabled ? 'true' : 'false');
+          // Handle all cases: true, false, null, undefined, or object
+          if (passData === true) {
+            localStorage.setItem('aries-links-pass-protect', 'true');
+          } else {
+            // null, false, undefined — all mean disabled
+            localStorage.setItem('aries-links-pass-protect', 'false');
           }
         }
+        // If fetch fails, fall through to whatever localStorage already has
       } catch (e) {
         console.warn('Could not fetch real-time pass protect status', e);
       }
