@@ -334,6 +334,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+
+    // Smart Tab Switch: Pause music and video when switching away, auto-resume when returning
+    let wasPlayingBeforeHidden = false;
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (!bgVideo.paused) {
+          wasPlayingBeforeHidden = true;
+          bgVideo.pause(); // Pauses video and music playback instantly
+        }
+      } else {
+        if (wasPlayingBeforeHidden) {
+          wasPlayingBeforeHidden = false;
+          bgVideo.play().catch(() => { }); // Resumes right where left off
+        }
+      }
+    });
   }
 
   // ═════════════════════════════════════════════
@@ -361,17 +377,18 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem(sessionKey, '1');
     }
 
-    // Call CounterAPI up (increment) or get (view)
+    // Call global counter API: hit (increment for new visitor) or get (fetch for returning tab)
     const endpoint = isNewSession
-      ? 'https://api.counterapi.dev/v1/udithaanuhas-aries-portfolio/views/up'
-      : 'https://api.counterapi.dev/v1/udithaanuhas-aries-portfolio/views/';
+      ? 'https://abacus.jasoncameron.dev/hit/udithaanuhas-aries/views'
+      : 'https://abacus.jasoncameron.dev/get/udithaanuhas-aries/views';
 
     fetch(endpoint)
       .then(res => res.json())
       .then(data => {
-        if (data && typeof data.count === 'number') {
-          localStorage.setItem('aries-link-views-global', data.count.toString());
-          animateCountTo(data.count);
+        const val = (data && typeof data.value === 'number') ? data.value : (data && typeof data.count === 'number' ? data.count : null);
+        if (val !== null && val > 0) {
+          localStorage.setItem('aries-link-views-global', val.toString());
+          animateCountTo(val);
         } else {
           fallbackLocalCounter();
         }
