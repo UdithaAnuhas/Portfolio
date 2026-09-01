@@ -498,10 +498,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
   }
 
-  // Open modal (Check slider toggle state: if enabled, demand password; if disabled, open directly)
+  // Open modal (Worldwide Firebase sync: if enabled, demand password from everyone; if disabled, open directly)
   if (adminBtn && adminModal) {
-    adminBtn.addEventListener('click', () => {
+    adminBtn.addEventListener('click', async () => {
       adminModal.classList.add('open');
+
+      // Live check with Firebase so any global toggle change is immediate for all visitors worldwide
+      try {
+        const passRes = await fetch(FIREBASE_PASS_PROTECT_URL).catch(() => null);
+        if (passRes && passRes.ok) {
+          const passData = await passRes.json();
+          if (passData !== null && passData !== undefined) {
+            const isEnabled = typeof passData === 'boolean' ? passData : passData.enabled;
+            localStorage.setItem('aries-links-pass-protect', isEnabled ? 'true' : 'false');
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch real-time pass protect status', e);
+      }
+
       const isProtectEnabled = localStorage.getItem('aries-links-pass-protect') === 'true';
 
       if (isProtectEnabled) {
