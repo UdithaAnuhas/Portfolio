@@ -273,6 +273,28 @@
             scrollbar-width: none;
         }
 
+        /* Infinite marquee carousel */
+        .marquee-track {
+            display: flex;
+            gap: 1.5rem;
+            width: max-content;
+            animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+        }
+
+        .marquee-track.marquee-paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes marquee-scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
         /* Fix login error display */
         .login-error-msg {
             display: none;
@@ -428,17 +450,22 @@
             <!-- Settings Content -->
             <div class="space-y-4 relative z-10 pt-2">
                 <!-- Links Password Protection Toggle -->
-                <div class="p-4 rounded-2xl bg-purple-950/60 border border-purple-500/20 flex items-center justify-between gap-4">
+                <div
+                    class="p-4 rounded-2xl bg-purple-950/60 border border-purple-500/20 flex items-center justify-between gap-4">
                     <div>
                         <div class="flex items-center gap-2 text-sm font-bold text-white">
                             <i class="fa-solid fa-shield-halved text-purple-400"></i> Links Page Password
                         </div>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Require password to open background admin on Links Page</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Require password to open background admin on Links
+                            Page</p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer shrink-0">
                         <input type="checkbox" id="admin-links-pass-toggle" class="sr-only peer">
-                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                        <span id="admin-links-pass-status" class="ml-2 text-[11px] font-bold text-purple-300">Disabled</span>
+                        <div
+                            class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600">
+                        </div>
+                        <span id="admin-links-pass-status"
+                            class="ml-2 text-[11px] font-bold text-purple-300">Disabled</span>
                     </label>
                 </div>
             </div>
@@ -472,7 +499,9 @@
                 <a href="#gaming" class="hover:text-emerald-400 transition-colors py-1">Games</a>
                 <a href="#memories" class="hover:text-amber-400 transition-colors py-1">Vault</a>
                 <a href="#connect" class="hover:text-purple-300 transition-colors py-1">Connect</a>
-                <a href="links.html" target="aries_links_tab" rel="noopener" class="hover:text-purple-300 transition-colors py-1 text-purple-300 font-bold"><i class="fa-solid fa-link mr-1 text-xs"></i> Links</a>
+                <a href="links.html" target="aries_links_tab" rel="noopener"
+                    class="hover:text-purple-300 transition-colors py-1 text-purple-300 font-bold"><i
+                        class="fa-solid fa-link mr-1 text-xs"></i> Links</a>
             </nav>
 
             <div class="flex items-center gap-3">
@@ -518,8 +547,9 @@
             <a href="#gaming" class="block text-slate-200 font-medium hover:text-emerald-400">Games</a>
             <a href="#memories" class="block text-slate-200 font-medium hover:text-amber-400">Vault</a>
             <a href="#connect" class="block text-slate-200 font-medium hover:text-purple-300">Connect</a>
-            <a href="links.html" target="aries_links_tab" rel="noopener" class="block text-purple-300 font-bold hover:text-purple-200"><i
-                    class="fa-solid fa-link mr-1"></i> My Links</a>
+            <a href="links.html" target="aries_links_tab" rel="noopener"
+                class="block text-purple-300 font-bold hover:text-purple-200"><i class="fa-solid fa-link mr-1"></i> My
+                Links</a>
         </div>
     </header>
 
@@ -845,25 +875,32 @@
                     <div class="h-44 overflow-hidden relative bg-[#061118] flex items-center justify-center">
                         <picture class="w-full h-full flex items-center justify-center">
                             <source srcset="./assets/images/ol-companion-preview.avif" type="image/avif">
-                            <img src="./assets/images/ol-companion-preview.png" alt="OL Study Companion"
-                                loading="eager" class="w-full h-full object-contain">
+                            <img src="./assets/images/ol-companion-preview.png" alt="OL Study Companion" loading="eager"
+                                class="w-full h-full object-contain">
                         </picture>
                     </div>
                     <div class="p-6 space-y-2 flex flex-col flex-1">
-                        <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest">O/L STUDY APP</span>
+                        <span class="text-[10px] font-black text-teal-400 uppercase tracking-widest">O/L STUDY
+                            APP</span>
                         <h3 class="text-lg font-bold text-white">OL Study Companion</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed flex-1">A smart web app that tracks your study progress, highlights gaps, and keeps you exam-focused — so you always know where you stand and what to conquer next.</p>
+                        <p class="text-xs text-slate-300 leading-relaxed flex-1">A smart web app that tracks your study
+                            progress, highlights gaps, and keeps you exam-focused — so you always know where you stand
+                            and what to conquer next.</p>
                         <div class="flex flex-wrap gap-2 pt-2">
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-cyan-300 border border-cyan-500/30">Next.js</span>
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-sky-300 border border-sky-500/30">Tailwind</span>
-                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-orange-300 border border-orange-500/30">Firebase</span>
+                            <span
+                                class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-cyan-300 border border-cyan-500/30">Next.js</span>
+                            <span
+                                class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-sky-300 border border-sky-500/30">Tailwind</span>
+                            <span
+                                class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-purple-950 text-orange-300 border border-orange-500/30">Firebase</span>
                         </div>
                         <div class="flex gap-2 pt-3">
                             <a href="https://ol-study-companion.vercel.app/" target="_blank" rel="noopener noreferrer"
                                 class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-teal-600/90 hover:bg-teal-500 text-white text-[11px] font-bold transition-all hover:shadow-lg hover:shadow-teal-500/30">
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Live Demo
                             </a>
-                            <a href="https://github.com/UdithaAnuhas/ol-study-companion" target="_blank" rel="noopener noreferrer"
+                            <a href="https://github.com/UdithaAnuhas/ol-study-companion" target="_blank"
+                                rel="noopener noreferrer"
                                 class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-purple-950 hover:bg-purple-800 border border-teal-500/40 hover:border-teal-400 text-teal-300 text-[11px] font-bold transition-all">
                                 <i class="fa-brands fa-github text-[12px]"></i> GitHub
                             </a>
@@ -878,7 +915,8 @@
                             class="fa-solid fa-code text-5xl text-amber-400/70 group-hover:scale-110 transition-transform"></i>
                     </div>
                     <div class="p-6 space-y-2">
-                        <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">PASCAL LOGIC</span>
+                        <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest">PASCAL
+                            LOGIC</span>
                         <h3 class="text-lg font-bold text-white">Pascal Algorithmic Programs</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">Foundational algorithms, data structures, and
                             math logic in Pascal.</p>
@@ -920,25 +958,11 @@
                 <div class="w-14 h-1 purple-gradient-bg mx-auto rounded-full"></div>
             </div>
 
-            <!-- Games Carousel Container -->
-            <div class="relative group/carousel mb-8">
-                <!-- Left Arrow -->
-                <button id="games-prev-btn" aria-label="Previous Games"
-                    class="absolute -left-4 sm:-left-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-purple-950/90 text-white border border-purple-500/40 shadow-2xl backdrop-blur-md hover:bg-emerald-500 hover:border-emerald-400 flex items-center justify-center transition-all opacity-90 hover:scale-110 focus:outline-none cursor-pointer">
-                    <i class="fa-solid fa-chevron-left text-sm"></i>
-                </button>
-
-                <!-- Scrollable Horizontal Grid -->
-                <div id="games-grid"
-                    class="flex gap-6 overflow-x-auto scroll-smooth no-scrollbar py-2 px-1 snap-x snap-mandatory">
+            <!-- Games Carousel Container (Infinite Smooth Marquee) -->
+            <div class="marquee-wrapper overflow-hidden mb-8 py-2" id="games-marquee-wrapper">
+                <div class="marquee-track" id="games-grid">
                     <!-- Rendered by JS from storage -->
                 </div>
-
-                <!-- Right Arrow -->
-                <button id="games-next-btn" aria-label="Next Games"
-                    class="absolute -right-4 sm:-right-6 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-purple-950/90 text-white border border-purple-500/40 shadow-2xl backdrop-blur-md hover:bg-emerald-500 hover:border-emerald-400 flex items-center justify-center transition-all opacity-90 hover:scale-110 focus:outline-none cursor-pointer">
-                    <i class="fa-solid fa-chevron-right text-sm"></i>
-                </button>
             </div>
 
             <!-- Add game form — ADMIN ONLY (hidden from visitors) -->
@@ -1794,6 +1818,20 @@
                     grid.appendChild(card);
                 });
 
+                // Clone all cards for seamless infinite loop
+                const allCards = Array.from(grid.children);
+                allCards.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    clone.classList.add('marquee-clone');
+                    // Re-bind click events on clones would be complex, so clones are visual-only
+                    grid.appendChild(clone);
+                });
+
+                // Set animation speed based on number of cards (more cards = longer duration)
+                const cardCount = games.length;
+                const duration = Math.max(cardCount * 4, 20); // ~4s per card, minimum 20s
+                grid.style.setProperty('--marquee-duration', duration + 's');
+
                 // Bind delete buttons
                 document.querySelectorAll('.delete-game').forEach(btn => {
                     btn.addEventListener('click', (e) => {
@@ -1937,64 +1975,35 @@
                         <p class="text-[10px] text-emerald-500/70">PNG, JPG, WEBP supported</p>
                     `;
                     }
-                    // Scroll carousel to the right end where the new game was added
-                    const gridEl = document.getElementById('games-grid');
-                    if (gridEl) {
-                        setTimeout(() => {
-                            gridEl.scrollTo({ left: gridEl.scrollWidth, behavior: 'smooth' });
-                        }, 100);
-                    }
                 });
             }
 
-            // ===== GAMES CAROUSEL NAVIGATION (4 BY 4 AUTO SCROLL) =====
-            const gamesPrevBtn = document.getElementById('games-prev-btn');
-            const gamesNextBtn = document.getElementById('games-next-btn');
-            const gamesGridEl = document.getElementById('games-grid');
+            // ===== GAMES CAROUSEL (Infinite Smooth Marquee) =====
+            // Only pause when the mouse stays still on the carousel for 500ms (intentional hover).
+            // Scrolling past the section won't interrupt the animation.
+            const marqueeWrapper = document.getElementById('games-marquee-wrapper');
+            const marqueeTrack = document.getElementById('games-grid');
+            if (marqueeWrapper && marqueeTrack) {
+                let hoverPauseTimer = null;
 
-            if (gamesGridEl) {
-                const scroll4By4 = (direction = 'next') => {
-                    const scrollAmount = gamesGridEl.clientWidth; // Scrolls full set of 4 visible cards
-                    if (direction === 'next') {
-                        // Loop back to start if near the end
-                        if (gamesGridEl.scrollLeft + gamesGridEl.clientWidth >= gamesGridEl.scrollWidth - 15) {
-                            gamesGridEl.scrollTo({ left: 0, behavior: 'smooth' });
-                        } else {
-                            gamesGridEl.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-                        }
-                    } else {
-                        // Loop to end if near start
-                        if (gamesGridEl.scrollLeft <= 15) {
-                            gamesGridEl.scrollTo({ left: gamesGridEl.scrollWidth, behavior: 'smooth' });
-                        } else {
-                            gamesGridEl.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-                        }
-                    }
-                };
+                marqueeWrapper.addEventListener('mouseenter', () => {
+                    hoverPauseTimer = setTimeout(() => {
+                        marqueeTrack.classList.add('marquee-paused');
+                    }, 550);
+                });
 
-                if (gamesPrevBtn) gamesPrevBtn.addEventListener('click', () => scroll4By4('prev'));
-                if (gamesNextBtn) gamesNextBtn.addEventListener('click', () => scroll4By4('next'));
+                marqueeWrapper.addEventListener('mousemove', () => {
+                    // Mouse is moving — reset the pause timer
+                    clearTimeout(hoverPauseTimer);
+                    hoverPauseTimer = setTimeout(() => {
+                        marqueeTrack.classList.add('marquee-paused');
+                    }, 550);
+                });
 
-                // Auto smooth scroll timer (Every 5 seconds)
-                let autoScrollTimer = setInterval(() => {
-                    if (gamesGridEl.scrollWidth > gamesGridEl.clientWidth + 20) {
-                        scroll4By4('next');
-                    }
-                }, 5000);
-
-                // Pause autoscroll when user hovers or interacts
-                const carouselBox = gamesGridEl.parentElement;
-                if (carouselBox) {
-                    carouselBox.addEventListener('mouseenter', () => clearInterval(autoScrollTimer));
-                    carouselBox.addEventListener('mouseleave', () => {
-                        clearInterval(autoScrollTimer);
-                        autoScrollTimer = setInterval(() => {
-                            if (gamesGridEl.scrollWidth > gamesGridEl.clientWidth + 20) {
-                                scroll4By4('next');
-                            }
-                        }, 5000);
-                    });
-                }
+                marqueeWrapper.addEventListener('mouseleave', () => {
+                    clearTimeout(hoverPauseTimer);
+                    marqueeTrack.classList.remove('marquee-paused');
+                });
             }
 
             // ===== MEMORIES GALLERY WITH CATEGORY FILTER =====

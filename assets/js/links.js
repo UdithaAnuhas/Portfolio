@@ -320,8 +320,80 @@ document.addEventListener('DOMContentLoaded', () => {
     if (enterOverlay) {
       enterOverlay.addEventListener('click', () => {
         enableSound();
+        // Request fullscreen for immersive experience
+        const el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen().catch(() => { });
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
       });
     }
+
+    // Exit Fullscreen button
+    const exitFsBtn = document.getElementById('exit-fullscreen-btn');
+
+    function isApiFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+    }
+
+    function isF11Fullscreen() {
+      return !isApiFullscreen() && window.innerHeight === screen.height && window.innerWidth === screen.width;
+    }
+
+    function updateFullscreenBtn() {
+      if (!exitFsBtn) return;
+      const apiFs = isApiFullscreen();
+      const f11Fs = isF11Fullscreen();
+      const visitorCounter = document.querySelector('.visitor-counter');
+
+      if (apiFs || f11Fs) {
+        exitFsBtn.classList.add('visible');
+        const icon = exitFsBtn.querySelector('i');
+        const label = exitFsBtn.querySelector('span');
+        if (f11Fs) {
+          if (icon) icon.className = 'fa-solid fa-keyboard';
+          if (label) label.textContent = 'Press F11 to exit';
+          exitFsBtn.style.pointerEvents = 'none';
+          exitFsBtn.style.cursor = 'default';
+        } else {
+          if (icon) icon.className = 'fa-solid fa-compress';
+          if (label) label.textContent = 'Exit Fullscreen';
+          exitFsBtn.style.pointerEvents = '';
+          exitFsBtn.style.cursor = 'pointer';
+        }
+
+        if (visitorCounter) {
+          visitorCounter.classList.add('pushed-right');
+          requestAnimationFrame(() => {
+            const btnWidth = exitFsBtn.offsetWidth || 150;
+            visitorCounter.style.setProperty('--counter-left', (20 + btnWidth + 8) + 'px');
+          });
+        }
+      } else {
+        exitFsBtn.classList.remove('visible');
+        if (visitorCounter) {
+          visitorCounter.classList.remove('pushed-right');
+          visitorCounter.style.removeProperty('--counter-left');
+        }
+      }
+    }
+
+    if (exitFsBtn) {
+      exitFsBtn.addEventListener('click', () => {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          // Exit JS fullscreen
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+        // For F11 fullscreen, we can't programmatically exit, so hide the button
+        exitFsBtn.classList.remove('visible');
+      });
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenBtn);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenBtn);
+    window.addEventListener('resize', updateFullscreenBtn);
+    updateFullscreenBtn(); // Run immediately to avoid layout flash
 
     // Manual audio toggle button
     if (audioToggle) {
