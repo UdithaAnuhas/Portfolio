@@ -377,17 +377,18 @@ document.addEventListener('DOMContentLoaded', () => {
       sessionStorage.setItem(sessionKey, '1');
     }
 
-    // Call CounterAPI up (increment) or get (view)
+    // Call global counter API: hit (increment for new visitor) or get (fetch for returning tab)
     const endpoint = isNewSession
-      ? 'https://api.counterapi.dev/v1/udithaanuhas-aries-portfolio/views/up'
-      : 'https://api.counterapi.dev/v1/udithaanuhas-aries-portfolio/views/';
+      ? 'https://abacus.jasoncameron.dev/hit/udithaanuhas-aries/views'
+      : 'https://abacus.jasoncameron.dev/get/udithaanuhas-aries/views';
 
     fetch(endpoint)
       .then(res => res.json())
       .then(data => {
-        if (data && typeof data.count === 'number') {
-          localStorage.setItem('aries-link-views-global', data.count.toString());
-          animateCountTo(data.count);
+        const val = (data && typeof data.value === 'number') ? data.value : (data && typeof data.count === 'number' ? data.count : null);
+        if (val !== null && val > 0) {
+          localStorage.setItem('aries-link-views-global', val.toString());
+          animateCountTo(val);
         } else {
           fallbackLocalCounter();
         }
@@ -409,9 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ═════════════════════════════════════════════
   // 6. ADMIN BACKGROUND CONTROLS
   // ═════════════════════════════════════════════
-  // Separate password for links page background controls (password: 0000 or Manvisalacariyek)
-  const LINKS_ADMIN_HASH = '9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0'; // SHA-256 for 0000
-  const MANVISAL_HASH = '6f95137c63fb5682cd54d5ac63ac3da874a4a418d1e2487034a0bcfed6616a5f'; // SHA-256 for Manvisalacariyek
+  // Separate password for links page background controls (password:)
+  const LINKS_ADMIN_HASH = '9af15b336e6a9619928537df30b2e6a2376569fcf9d7e773eccede65606529a0'; // SHA-256 for links admin
+  const MANVISAL_HASH = '6f95137c63fb5682cd54d5ac63ac3da874a4a418d1e2487034a0bcfed6616a5f'; // SHA-256 for password admin
   const LINKS_SESSION_KEY = 'aries-links-admin-session';
 
   const adminBtn = document.getElementById('admin-btn');
